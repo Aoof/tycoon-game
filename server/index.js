@@ -4,7 +4,7 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
-import db from './db.js';
+// import db from './db.js';
 import dotenv from 'dotenv';
 
 import { handler } from '../build/handler.js';
@@ -27,10 +27,15 @@ const sessionOptions = session({
 
 app.use(sessionOptions);
 
-app.use(express.static('static'));
+app.use(express.static('../static'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors(':method :url :status :res[content-length] bytes - :response-time ms'));
+
+app.use((req, res, next) => {
+	console.log("Request received: " + req.method + req.url);
+	next();
+});
 
 app.post("/lobby", (req, res) => {
   const { lobbyId, token } = req.body;
@@ -52,7 +57,7 @@ server.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
 
-app.on('close', () => {
+/* app.on('close', () => {
     db.disconnect();
 });
 
@@ -64,3 +69,4 @@ process.on('SIGINT', () => {
         process.exit(0);
     });
 });
+*/
