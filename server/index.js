@@ -4,7 +4,7 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
-import { db } from './db.js';
+import db from './db.js';
 import dotenv from 'dotenv';
 
 import { handler } from '../build/handler.js';
