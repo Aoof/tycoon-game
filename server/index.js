@@ -8,7 +8,7 @@ import MongoStore from 'connect-mongo';
 import dotenv from 'dotenv';
 
 import { handler } from '../build/handler.js';
-import path from 'path';
+import path from 'node:path';
 
 dotenv.config();
 
@@ -27,7 +27,6 @@ const sessionOptions = session({
 
 app.use(sessionOptions);
 
-app.use(express.static('../static'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors(':method :url :status :res[content-length] bytes - :response-time ms'));
@@ -40,12 +39,6 @@ app.use((req, res, next) => {
 app.post("/lobby", (req, res) => {
   const { lobbyId, token } = req.body;
   res.status(501).json({ message: "Lobby not created (not yet implemented)", lobbyId, token });
-});
-
-app.get("/.well-known/acme-challenge/:token", (req, res) => {
-  const { token } = req.params;
-  let challenge = path.join(__dirname, '..', 'static', '.well-known', 'acme-challenge', token);
-  res.sendFile(challenge);
 });
 
 io.on('connection', (socket) => {
