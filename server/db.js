@@ -1,8 +1,32 @@
-import { MongoClient } from "mongodb";
+import { MongoClient, ServerApiVersion } from 'mongodb';
 
-const uri = process.env.MONGODB_URI;
-const client = new MongoClient(uri);
+let instance = null;
 
-const db = client.db("primary-db");
+export default class Database {
+    constructor() {
+        if (!instance) {
+            instance = this;
+            this.client = new MongoClient(process.env.MONGODB_URI, {
+                serverApi: {
+                    version: ServerApiVersion.v1,
+                    strict: true,
+                    deprecationErrors: true
+                }
+            });
+            this.client.connect();
+        }
+        return instance;
+    }
 
-export default db;
+    async disconnect() {
+        try {
+            await this.client.close();
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    get db() {
+        return this.client.db(process.env.DBNAME);
+    }
+}
