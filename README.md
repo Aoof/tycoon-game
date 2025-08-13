@@ -1,3 +1,8 @@
+# Tycoon Game - aoof
+
+Inspired by the Persona 5 Tycoon playing cards game I decided to create a website similar to many other playing cards websites, however what makes it different is that this specific game and ruleset seemed to be exclusive to Persona 5, so my project will bring that experience into a modern UI/UX and allow users to play against each other (as opposed to the original only vs AI in P5). Eventually I'd like to create AI bots to play against the players, but first I must create a reliable game following a clean and efficient codebase.
+
+Using svelte for the frontend and creating an aesthetically appealing game interface, and express.js alongside node to create the authentication system and lay down a solid infrastucture for this project to make it production-ready, and WebSockets to allow seamless interactivity between players I will create a comfortable and intuitive environment that everyone can enjoy.
 
 ## Workflow thoughts
 
