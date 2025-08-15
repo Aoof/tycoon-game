@@ -1,4 +1,14 @@
+@import 'https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap';
+@import 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css';
 @import 'tailwindcss';
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
 
+body {
+    @apply bg-gradient-to-br via-emerald-400 from-emerald-400 to-cyan-400;
+    @apply dark:from-fuchsia-900 dark:to-purple-900 dark:via-purple-800;
+    @apply min-h-screen;
+
+    font-family: 'Inter', sans-serif;
+    @apply antialiased;
+}

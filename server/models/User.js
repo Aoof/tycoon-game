@@ -12,7 +12,6 @@ export default class User {
     }
 
     async cleanUp() {
-        // Only keep necessary fields and trim strings
         this.data = {
             username: typeof this.data.username === 'string' ? this.data.username.trim() : '',
             email: typeof this.data.email === 'string' ? this.data.email.trim().toLowerCase() : '',
@@ -66,7 +65,6 @@ export default class User {
                 throw ['Email already registered.'];
             }
         }
-        // Hash password
         const salt = await bcrypt.genSalt(10);
         this.data.password = await bcrypt.hash(this.data.password, salt);
         await this.usersCollection.insertOne(this.data);

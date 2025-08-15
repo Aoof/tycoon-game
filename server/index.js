@@ -19,7 +19,7 @@ const port = process.env.PORT || 3000;
 const app = express();
 const server = createServer(app);
 
-// const io = new Server(server);
+const io = new Server(server);
 
 const sessionOptions = session({
     secret: process.env.SESSION_SECRET || 'default_secret',
@@ -48,6 +48,14 @@ app.post("/lobby", (req, res) => {
 
 app.use(handler);
 
+io.on('connection', socket => {
+    console.log("New user connected with the id: " + socket.id);
+
+    socket.on('disconnect', () => {
+        console.log("User disconnected with the id: " + socket.id);
+    });
+});
+
 const db = new Database();
 
 server.listen(port, () => {
@@ -56,13 +64,4 @@ server.listen(port, () => {
 
 app.on('close', () => {
     db.disconnect();
-});
-
-process.on('SIGINT', () => {
-    console.log('Received SIGINT. Closing server...');
-    server.close(() => {
-        console.log('Server closed.');
-        db.disconnect();
-        process.exit(0);
-    });
 });
