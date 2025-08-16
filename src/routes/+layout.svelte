@@ -1,48 +1,29 @@
 <script lang="ts">
 	import '../app.css';
-	import { theme } from '$lib/stores/utils';
 	import { user } from '$lib/stores/auth';
+	import { page } from '$app/state';
 	import favicon from '$lib/assets/favicon.svg';
 	import Navbar from '$lib/components/Navbar.svelte';
-	import Login from '$lib/components/Login.svelte';
+	import LoginForm from "$lib/components/login-form.svelte";
+	import { ModeWatcher } from 'mode-watcher';
+
+	const NO_AUTH_ROUTES = ['/register', '/forgot-password', '/terms-of-service', '/privacy-policy', '/page-not-found'];
 
 	let { children } = $props();
-
-	import { onMount } from 'svelte';
-
-	onMount(() => {
-		document.documentElement.classList.toggle(
-			"dark",
-			localStorage.theme === "dark" ||
-			(!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches),
-		);
-
-		theme.subscribe(value => {
-			document.documentElement.classList.toggle("dark", value === 'dark');
-			localStorage.theme = value;
-		});
-	});
-
-	// // Settings for the themes
-	// // Whenever the user explicitly chooses light mode
-	// localStorage.theme = "light";
-	// // Whenever the user explicitly chooses dark mode
-	// localStorage.theme = "dark";
-	// // Whenever the user explicitly chooses to respect the OS preference
-	// localStorage.removeItem("theme");
 </script>
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-{#if $user}
-	<main class=''>
-		<Navbar />
-		{@render children?.()}
-	</main>
+<ModeWatcher />
+{#if $user || NO_AUTH_ROUTES.includes(page.url.pathname)}
+	{@render children?.()}
 {:else}
-	<main class='flex flex-col items-center justify-center min-h-screen'>
-		<Login />
-	</main>
+	<div class="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
+		<div class="w-full max-w-sm md:max-w-3xl">
+			<Navbar navigationStyle="login" />
+			<LoginForm />
+		</div>
+	</div>
 {/if}

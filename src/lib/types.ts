@@ -4,3 +4,9 @@ export interface User {
     email: string;
     isVerified: boolean;
 }
+
+export interface UserPayload {
+    email: string | null;
+    username: string;
+    password: string;
+}
