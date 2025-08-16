@@ -22,13 +22,14 @@ async function sendOtpEmail(email, otp) {
     await transporter.sendMail({
         from: process.env.EMAIL,
         to: email,
-        subject: 'Your OTP Code for Tycoon-Aoof',
+        subject: 'Your OTP Code for Tycoon Game by aoof',
         text: `Your OTP code is ${otp}`,
         html: otpTemplate().replace("${{otp}}", otp).replace("${{username}}", email.split('@')[0])
     });
 }
 
 let register = async (req, res) => {
+    console.log(req.body);
     if (!req.body) {
         return res.send({ success: false, message: 'Please enter all fields' });
     }
@@ -47,8 +48,14 @@ let register = async (req, res) => {
             isVerified: false
         });
 
-        user.register().then(async () => {
+        user.register().then(async userId => {
             await sendOtpEmail(email, otp);
+            res.send({success: true, message: 'OTP sent to email', data: {
+                id: userId,
+                username,
+                email,
+                isVerified: false
+            } });
         }).catch(err => {
             res.send({ success: false, message: 'User registration failed', data: err });
         })
@@ -66,22 +73,17 @@ let login = async (req, res) => {
     if (!username || !password) {
         return res.send({ success: false, message: 'Please enter all fields' });
     }
-    let user = new User();
+    let user = new User({
+        username,
+        password
+    });
 
-    await user.findByUsername(username).then(async user => {
-        if (!user) {
-            return res.send({ success: false, message: 'Invalid Credentials' });
-        }
-
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.send({ success: false, message: 'Invalid Credentials' });
-        }
-
+    await user.login().then(async user => {
         const payload = {
             user: {
                 id: user._id.toString(),
-                username: user.username
+                username: user.username,
+                isVerified: user.isVerified
             }
         };
 
@@ -143,7 +145,9 @@ let verifyOtp = async (req, res) => {
 
         const payload = {
             user: {
-                id: user.id
+                id: user.id,
+                username: user.username,
+                isVerified: user.isVerified
             }
         };
 
@@ -154,14 +158,40 @@ let verifyOtp = async (req, res) => {
             { expiresIn: 360000 },
             (err, token) => {
                 if (err) throw err;
-                res.send({ token, success: true, message: 'Registration successful' });
+                res.send({ token, success: true, message: 'Registration successful', data: user });
             }
         );
-
-        res.send({ success: true, message: 'OTP verified successfully' });
     }).catch(err => {
         res.send({ success: false, message: 'Server error please contact administrators.' });
     });
 };
 
-export { register, login, logout, verify, verifyOtp };
+let requestOtp = async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return res.send({ success: false, message: 'Please provide email' });
+    }
+
+    let user = new User();
+
+    await user.findByEmail(email).then(async user => {
+        if (!user) {
+            return res.send({ success: false, message: 'User not found' });
+        }
+
+        const otp = Math.floor(100000 + Math.random() * 900000);
+        user.otp = otp;
+        user.otpExpires = Date.now() + 3600000; // 1 hour
+
+        await user.save();
+
+        await sendOtpEmail(email, otp);
+
+        res.send({ success: true, message: 'OTP sent to email' });
+    }).catch(err => {
+        res.send({ success: false, message: 'Server error please contact administrators.' });
+    });
+};
+
+export { register, login, logout, verify, verifyOtp, requestOtp };

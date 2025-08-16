@@ -28,17 +28,17 @@
 					</div>
 					<div class="grid gap-3">
 						<Label for="username-{id}">Username</Label>
-						<Input id="username-{id}" type="text" required />
+						<Input id="username-{id}" name="username" type="text" required />
 					</div>
 					<div class="grid gap-3">
 						<Label for="email-{id}">Email</Label>
-						<Input id="email-{id}" type="email" required />
+						<Input id="email-{id}" name="email" type="email" required />
 					</div>
 					<div class="grid gap-3">
 						<div class="flex items-center">
-							<Label for="password">Password</Label>
+							<Label for="password-{id}">Password</Label>
 						</div>
-						<Input id="password-{id}" type="password" required />
+						<Input id="password-{id}" name="password" type="password" required />
 					</div>
 					<Button type="submit" class="w-full">Sign up</Button>
 					<div

@@ -44,31 +44,33 @@ export default class User {
         return await this.usersCollection.findOne({ email: email });
     }
 
-    async register() {
-        await this.cleanUp();
-        let errors = this.validate();
-        if (errors.length) {
-            throw errors;
-        }
-        // Check for duplicate username or email
-        let existingUser = await this.usersCollection.findOne({
-            $or: [
-                { username: this.data.username },
-                { email: this.data.email }
-            ]
-        });
-        if (existingUser) {
-            if (existingUser.username === this.data.username) {
-                throw ['Username already taken.'];
+    register() {
+        return new Promise(async (resolve, reject) => {
+            await this.cleanUp();
+            let errors = this.validate();
+            if (errors.length) {
+                return reject(errors);
             }
-            if (existingUser.email === this.data.email) {
-                throw ['Email already registered.'];
+            // Check for duplicate username or email
+            let existingUser = await this.usersCollection.findOne({
+                $or: [
+                    { username: this.data.username },
+                    { email: this.data.email }
+                ]
+            });
+            if (existingUser) {
+                if (existingUser.username === this.data.username) {
+                    return reject(['Username already taken.']);
+                }
+                if (existingUser.email === this.data.email) {
+                    return reject(['Email already registered.']);
+                }
             }
-        }
-        const salt = await bcrypt.genSalt(10);
-        this.data.password = await bcrypt.hash(this.data.password, salt);
-        await this.usersCollection.insertOne(this.data);
-        return true;
+            const salt = await bcrypt.genSalt(10);
+            this.data.password = await bcrypt.hash(this.data.password, salt);
+            let user = await this.usersCollection.insertOne(this.data);
+            resolve(user.insertedId);
+        })
     }
 
     async login() {

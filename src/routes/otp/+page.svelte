@@ -1,5 +1,6 @@
 <script lang="ts">
 	import RegisterForm from "$lib/components/register-form.svelte";
+    import OtpForm from "$lib/components/otp-form.svelte";
     import Navbar from "$lib/components/Navbar.svelte";
 </script>
 
